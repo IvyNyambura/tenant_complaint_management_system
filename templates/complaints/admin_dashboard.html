@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Force background change so you know it's working */
+    .dashboard-wrapper {
+        background-color: #f3f4f6 !important;
+        min-height: 100vh;
+        padding: 2rem;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Stat Cards */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border-left: 5px solid #4e73df;
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-title {
+        color: #888;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Table Styles */
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+
+    .table-header {
+        background: #fff;
+        padding: 1.5rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .styled-table th {
+        background-color: #f8f9fa;
+        color: #555;
+        font-weight: 600;
+        text-align: left;
+        padding: 1rem;
+    }
+
+    .styled-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .styled-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Custom Badges */
+    .status-pill {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+    .status-new { background: #e3f2fd; color: #1565c0; }
+    .status-ack { background: #fff3e0; color: #ef6c00; }
+    .status-res { background: #e8f5e9; color: #2e7d32; }
+    .status-def { background: #eceff1; color: #455a64; }
+
+    /* Action Button */
+    .btn-view {
+        background: white;
+        border: 1px solid #4e73df;
+        color: #4e73df;
+        padding: 5px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    .btn-view:hover {
+        background: #4e73df;
+        color: white;
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div style="margin-bottom: 2rem;">
+        <h2 style="color: #333; font-weight: 800;">Admin Dashboard</h2>
+        <p style="color: #666;">Overview of tenant complaints</p>
+    </div>
+
+    <div class="stats-container">
+        {% for status, count in status_counts.items %}
+        <div class="stat-card">
+            <div class="stat-title">{{ status }} Complaints</div>
+            <div class="stat-value">{{ count }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <h4 style="margin:0; color:#4e73df;">Recent Tickets</h4>
+        </div>
+        <div class="table-responsive">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th>Tenant</th>
+                        <th>Unit</th>
+                        <th>Issue</th>
+                        <th>Status</th>
+                        <th>Assigned</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td><strong>#{{ complaint.ticket_number }}</strong></td>
+                        <td>{{ complaint.tenant.username }}</td>
+                        <td>
+                            <span style="background:#eee; padding:2px 8px; border-radius:4px; font-size:0.85rem;">
+                                {{ complaint.tenant.unit_number|default:"-" }}
+                            </span>
+                        </td>
+                        <td>{{ complaint.title|truncatewords:4 }}</td>
+                        <td>
+                            {% if complaint.status == 'NEW' %}
+                            <span class="status-pill status-new">New</span>
+                            {% elif complaint.status == 'ACK' %}
+                            <span class="status-pill status-ack">Progress</span>
+                            {% elif complaint.status == 'RES' %}
+                            <span class="status-pill status-res">Resolved</span>
+                            {% else %}
+                            <span class="status-pill status-def">{{ complaint.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="color: #666;">{{ complaint.assigned_to.username|default:"--" }}</td>
+                        <td style="color: #888; font-size:0.9rem;">{{ complaint.created_at|date:"M d" }}</td>
+                        <td>
+                            <a href="{% url 'complaints:complaint_detail' complaint.id %}" class="btn-view">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align:center; padding: 2rem; color: #999;">No complaints found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

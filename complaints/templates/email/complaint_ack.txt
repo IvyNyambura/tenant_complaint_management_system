@@ -1,0 +1,9 @@
+Hello {{ complaint.tenant.username }},
+
+Your complaint {{ complaint.tracking_number }} has been acknowledged.
+Assigned to: {{ complaint.assigned_to.username }}
+Status: {{ complaint.get_status_display }}
+
+We will keep you updated.
+
+— TenantCMS

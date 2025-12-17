@@ -1,0 +1,177 @@
+{% extends 'complaints/base.html' %}
+
+{% block content %}
+<style>
+
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        color: #333;
+    }
+
+    .dashboard-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+    }
+
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr; /* Left column is smaller */
+        gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .grid { grid-template-columns: 1fr; } /* Stack on mobile */
+    }
+
+
+    .dashboard-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e1e4e8;
+    }
+
+    .card-title {
+        margin-top: 0;
+        margin-bottom: 1.2rem;
+        font-size: 1.1rem;
+        color: #586069;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        border-bottom: 2px solid #f1f3f5;
+        padding-bottom: 0.8rem;
+    }
+
+
+    .stats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+
+    .stat-item:hover {
+        transform: translateX(5px);
+        background: #e9ecef;
+    }
+
+    .stat-name { font-weight: 500; color: #495057; }
+    .stat-count {
+        background: #007bff;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+
+    .complaint-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .complaint-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        transition: background 0.2s;
+    }
+
+    .complaint-item:last-child { border-bottom: none; }
+
+    .complaint-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .complaint-link {
+        text-decoration: none;
+        color: #0366d6;
+        font-weight: 600;
+        font-size: 1rem;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .complaint-meta {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        font-weight: bold;
+        background: #eee;
+        color: #555;
+    }
+</style>
+
+<div class="dashboard-container">
+    <h2 class="dashboard-title">Dashboard</h2>
+
+    <div class="grid">
+
+        <div class="dashboard-card">
+            <h4 class="card-title">Status Overview</h4>
+
+            <div class="stats-list">
+                {% for s in stats %}
+                <div class="stat-item">
+                    <span class="stat-name">{{ s.status }}</span>
+                    <span class="stat-count">{{ s.total }}</span>
+                </div>
+                {% empty %}
+                <p style="color: #999; text-align: center;">No data available.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h4 class="card-title">Recent Complaints</h4>
+
+            <div class="complaint-list">
+                {% for c in recent %}
+                <div class="complaint-item">
+                    <div>
+                        <a href="{% url 'complaints:detail' c.pk %}" class="complaint-link">
+                            {{ c.tracking_number }} - {{ c.title }}
+                        </a>
+                        </div>
+                    <div>
+                        <span class="status-badge">{{ c.status }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="padding: 1rem; text-align: center; color: #999;">
+                    No recent complaints found.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

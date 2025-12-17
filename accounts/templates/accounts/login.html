@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - TenantCMS</title>
+
+  <style>
+      /* RESET & LAYOUT */
+      * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+      body {
+          background-color: #f0f2f5;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+      }
+
+      /* CARD STYLES */
+      .login-card {
+          background: white;
+          padding: 2.5rem;
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          max-width: 400px;
+          text-align: center;
+      }
+
+      .login-card h2 { margin-bottom: 0.5rem; color: #333; }
+      .login-card .subtitle { color: #666; margin-bottom: 2rem; font-size: 0.9rem; }
+
+      /* FORM INPUTS */
+      .input-group { margin-bottom: 1.5rem; text-align: left; }
+
+      .input-group label {
+          display: block;
+          margin-bottom: 0.5rem;
+          color: #555;
+          font-size: 0.9rem;
+          font-weight: 600;
+      }
+
+      .input-group input {
+          width: 100%;
+          padding: 12px 15px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 1rem;
+          outline: none;
+          transition: border-color 0.3s;
+      }
+
+      .input-group input:focus {
+          border-color: #007bff;
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+      }
+
+      /* BUTTON */
+      .login-btn {
+          width: 100%;
+          padding: 12px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.3s;
+      }
+
+      .login-btn:hover { background-color: #0056b3; }
+
+      /* FOOTER */
+      .footer-links { margin-top: 1.5rem; font-size: 0.9rem; }
+      .footer-links a { color: #007bff; text-decoration: none; font-weight: 500; }
+      .footer-links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Login to the Tenant Management System</p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="input-group">
+        <label for="id_username">Username</label>
+        <input type="text" name="username" id="id_username" placeholder="Enter username" required>
+      </div>
+
+      <div class="input-group">
+        <label for="id_password">Password</label>
+        <input type="password" name="password" id="id_password" placeholder="Enter password" required>
+      </div>
+
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+
+    <div class="footer-links">
+      <p>Don't have an account? <a href="{% url 'accounts:signup' %}">Create account</a></p>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+Django==4.2
+mysqlclient==2.2.4
+django-crispy-forms==2.1
+crispy-bootstrap5==0.7
+django-filter==24.2
+python-dotenv==1.0.1

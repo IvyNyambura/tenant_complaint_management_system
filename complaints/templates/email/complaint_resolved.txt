@@ -1,0 +1,8 @@
+Hello {{ complaint.tenant.username }},
+
+Your complaint {{ complaint.tracking_number }} has been resolved.
+Resolved at: {{ complaint.resolved_at }}
+
+Thank you for your patience.
+
+— TenantCMS

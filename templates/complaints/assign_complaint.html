@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Assign Complaint</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Complaint: {{ complaint.ticket_number }}</h5>
+            <p><strong>Issue:</strong> {{ complaint.title }}</p>
+            <p><strong>Status:</strong> {{ complaint.get_status_display }}</p>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="manager_id" class="form-label">Assign to Manager:</label>
+            <select name="manager_id" id="manager_id" class="form-select" required>
+                <option value="">-- Select Manager --</option>
+                {% for manager in managers %}
+                <option value="{{ manager.id }}">{{ manager.get_full_name|default:manager.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign</button>
+        <a href="{% url 'complaints:complaint_detail' complaint.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'complaints/base.html' %}
+{% block content %}
+<h2>{{ complaint.tracking_number }} - {{ complaint.title }}</h2>
+<p><b>Category:</b> {{ complaint.get_category_display }}</p>
+<p><b>Priority:</b> {{ complaint.get_priority_display }}</p>
+<p><b>Status:</b> {{ complaint.get_status_display }}</p>
+<p><b>Assigned to:</b> {{ complaint.assigned_to|default:"Unassigned" }}</p>
+<p><b>Description:</b> {{ complaint.description }}</p>
+<hr>
+<h3>Timeline</h3>
+<ul>
+  {% for u in updates %}
+    <li>[{{ u.created_at|date:"Y-m-d H:i" }}] {{ u.actor }} → {{ u.get_status_display }}: {{ u.note }}</li>
+  {% empty %}
+    <li>No updates yet.</li>
+  {% endfor %}
+</ul>
+
+{% if request.user.role in 'MANAGER ADMIN' %}
+  <hr>
+ <a class="btn btn-secondary" href="{% url 'complaints:assign' complaint.pk %}">Acknowledge & Assign to me</a>
+  <h3 class="mt-3">Update status</h3>
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button class="btn btn-primary">Save update</button>
+  </form>
+{% endif %}
+{% endblock %}

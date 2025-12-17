@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TenantCMS</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="{% url 'complaints:dashboard' %}">Dashboard</a>
+    <a href="{% url 'complaints:list' %}">Complaints</a>
+    {% if request.user.is_authenticated and request.user.role == 'TENANT' %}
+      <a href="{% url 'complaints:create' %}">Submit</a>
+    {% endif %}
+    <span class="ms-auto">
+      {{ request.user.username }} |
+      <a href="{% url 'accounts:logout' %}">Logout</a>
+    </span>
+  </nav>
+  <main class="container">
+    {% if messages %}
+      <ul class="messages">
+        {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

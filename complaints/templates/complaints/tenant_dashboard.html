@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tenant Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    /* 1. LAYOUT & OVERRIDES */
+    .dashboard-container {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    /* 2. STATS GRID (Replaces simple rows) */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border-left: 5px solid #007bff; /* Default Primary */
+        transition: transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-card.pending { border-left-color: #ffc107; }
+    .stat-card.resolved { border-left-color: #28a745; }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #343a40;
+    }
+
+    /* 3. TABLE STYLES */
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .card-header-custom {
+        background: white;
+        padding: 1.5rem;
+        border-bottom: 2px solid #f1f1f1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-responsive {
+        padding: 0;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+    }
+
+    .custom-table th {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .custom-table td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
+        color: #212529; /* Ensures text is visible */
+    }
+
+    .custom-table tr:hover { background-color: #f8f9fa; }
+
+    /* 4. BADGES */
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    /* 5. BUTTONS */
+    .btn-create {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 4px 6px rgba(0,123,255,0.2);
+        transition: all 0.2s;
+        border: none;
+    }
+    .btn-create:hover { background-color: #0056b3; color: white; transform: translateY(-2px); }
+
+    .btn-view {
+        color: #17a2b8;
+        background: rgba(23, 162, 184, 0.1);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+    .btn-view:hover { background: #17a2b8; color: white; }
+</style>
+
+<div class="dashboard-container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 style="font-weight: 800; color: #333; margin: 0;">My Dashboard</h2>
+            <p class="text-muted" style="margin: 0;">Overview of your submitted complaints</p>
+        </div>
+        <a href="{% url 'complaints:create' %}" class="btn-create">
+            <i class="bi bi-plus-lg"></i> New Complaint
+        </a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Submitted</div>
+            <div class="stat-value">{{ total_complaints }}</div>
+        </div>
+
+        <div class="stat-card pending">
+            <div class="stat-label">Pending Review</div>
+            <div class="stat-value">{{ pending_complaints }}</div>
+        </div>
+
+        <div class="stat-card resolved">
+            <div class="stat-label">Resolved</div>
+            <div class="stat-value">{{ resolved_complaints }}</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="card-header-custom">
+            <h4 style="margin: 0; color: #444;">Recent Complaints</h4>
+        </div>
+
+        {% if complaints %}
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Tracking #</th>
+                        <th>Category</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td style="font-family: monospace; font-weight: bold; color: #555;">
+                            {{ complaint.tracking_number }}
+                        </td>
+                        <td>{{ complaint.get_category_display }}</td>
+                        <td>{{ complaint.subject }}</td>
+                        <td>
+                            <span class="status-badge bg-{{ complaint.get_status_badge }} text-white">
+                                {{ complaint.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge bg-{{ complaint.get_priority_badge }} text-white">
+                                {{ complaint.get_priority_display }}
+                            </span>
+                        </td>
+                        <td style="color: #666; font-size: 0.9rem;">
+                            {{ complaint.created_at|date:"M d, Y" }}
+                        </td>
+                        <td>
+                            <a href="{% url 'complaints:complaint_detail' complaint.pk %}" class="btn-view">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 4rem 2rem;">
+            <div style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+            <h5 style="color: #666;">No complaints found</h5>
+            <p class="text-muted">You haven't submitted any complaints yet.</p>
+            <a href="{% url 'complaints:create' %}" class="btn-create" style="display: inline-block; margin-top: 10px;">
+                Submit First Complaint
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="content-card">
+        <div class="card-header-custom">
+            <h4 style="margin: 0; color: #444;">Notifications</h4>
+        </div>
+        <div style="padding: 1.5rem; color: #666;">
+            <p style="font-style: italic;">No new notifications at this time.</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+Hello {{ complaint.tenant.username }},
+
+There is an update on complaint {{ complaint.tracking_number }}.
+Current status: {{ complaint.get_status_display }}
+
+— TenantCMS
